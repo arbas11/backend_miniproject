@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>edit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;1,300&family=Shadows+Into+Light&family=Varela+Round&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .alert-style {
+            background-color: darkgrey;
+            border-radius: 20px;
+            margin: 5px 10px;
+            text-align: center;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .btn-upload {
+            width: 5em;
+            padding: 1px 6px;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-style: none;
+            background-color: #D96098;
+        }
+
+        .alert-style-upload {
+            background-color: #FAEEE7;
+            color: #325288;
+            border-radius: 20px;
+            margin: 5px 10px;
+            text-align: center;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .upload-button {
+            margin-bottom: 40px;
+        }
+
+        .upload-container {
+            background-color: #FAEEE7;
+            padding: 50px;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+        }
+
+        .item-footer-modal {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .item-btn {
+            width: 5em;
+            padding: 1px 6px;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background-color: #325288;
+            border-style: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Update Your Product</h1>
+    <div class="form-group">
+        <form action="/merchant/<%=id%>/product/<%=prodid%>/edit?_method=PATCH" method="post">
+            <section>
+                <label for="product_name">Enter your product name:</label>
+                <textarea name="product_name" id="product_name" cols="30" rows="1"
+                    class="form-label-style"><%= result[0].product_name %></textarea>
+            </section>
+            <section>
+                <label for="quantity">Quantity:</label>
+                <textarea name="quantity" id="quantity" cols="10" rows="1"
+                    class="form-label-style"><%= result[0].quantity %></textarea>
+            </section>
+            <section>
+                <label for="product_price">Price:</label>
+                <textarea name="price" id="product_price" cols="10" rows="1"
+                    class="form-label-style"><%= result[0].price %></textarea>
+            </section>
+            <button class="item-btn btn btn-primary">submit</button>
+        </form>
+        <form action="/merchant/<%=result[0].merchant_id%>/product/<%=result[0].id%>/edit?_method=DELETE" method="post">
+            <button class="item-btn btn btn-primary">Delete</button>
+        </form>
+    </div>
+
+    <a href="/merchant/<%=result[0].merchant_id%>/product">back to product list</a>
+</body>
+
+</html>
