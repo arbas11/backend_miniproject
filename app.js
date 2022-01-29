@@ -6,7 +6,8 @@ const catchAsync = require('./utilities/catchAsync')
 const methodOverride = require('method-override')
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
-const session = require('express-session')
+const session = require('express-session');
+const AppError = require('./utilities/appError');
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -31,8 +32,7 @@ const isOwner = (req, res, next) => {
     const { id } = req.params;
     const usrid = req.session.user_id
     if (id !== usrid) {
-        res.send('not allowed')
-        return res.redirect(`/merchant/${usrid}/product`)
+        throw new AppError('you not allowed!!!', 401)
     }
     next();
 }
@@ -43,9 +43,9 @@ const connection = mysql.createConnection({
     password: 'root1234',
     database: 'merchant_dibimbing'
 });
-app.get('/auth/test', (req, res) => {
-    res.send(req.headers.authorization)
-})
+// app.get('/auth/test', (req, res) => {
+//     res.send(req.headers.authorization)
+// })
 app.get('/merchant', (req, res) => {
     res.render('merchant')
 });
@@ -104,7 +104,7 @@ app.get('/merchant/:id/product', isLogin, isOwner, catchAsync(async (req, res) =
     });
 }))
 
-app.post('/merchant/:id/product', isLogin, catchAsync(async (req, res) => {
+app.post('/merchant/:id/product', isLogin, isOwner, catchAsync(async (req, res) => {
     const id = req.session.user_id
     const newProduct = req.body;
     newProduct['merchant_id'] = id;
@@ -115,12 +115,12 @@ app.post('/merchant/:id/product', isLogin, catchAsync(async (req, res) => {
 
 }))
 
-app.get('/merchant/:id/product/new', isLogin, (req, res) => {
+app.get('/merchant/:id/product/new', isLogin, isOwner, (req, res) => {
     const id = req.session.user_id
     res.render('products/new', { id })
 })
 
-app.get('/merchant/:id/product/:prodid/edit', isLogin, async (req, res, next) => {
+app.get('/merchant/:id/product/:prodid/edit', isLogin, isOwner, async (req, res, next) => {
     try {
         const { prodid } = req.params;
         const id = req.session.user_id
@@ -133,7 +133,7 @@ app.get('/merchant/:id/product/:prodid/edit', isLogin, async (req, res, next) =>
         next(error)
     }
 })
-app.patch('/merchant/:id/product/:prodid/edit', isLogin, catchAsync(async (req, res) => {
+app.patch('/merchant/:id/product/:prodid/edit', isLogin, isOwner, catchAsync(async (req, res) => {
     const { prodid } = req.params;
     const id = req.session.user_id
     let newUpdate = {
@@ -147,7 +147,7 @@ app.patch('/merchant/:id/product/:prodid/edit', isLogin, catchAsync(async (req, 
         res.redirect(`/merchant/${id}/product`)
     });
 }))
-app.delete('/merchant/:id/product/:prodid/edit', isLogin, catchAsync(async (req, res) => {
+app.delete('/merchant/:id/product/:prodid/edit', isLogin, isOwner, catchAsync(async (req, res) => {
     const { prodid } = req.params;
     const id = req.session.user_id
     let q = `DELETE FROM product WHERE id = ${prodid}`
@@ -160,11 +160,11 @@ app.post('/merchant/logout', isLogin, (req, res) => {
     req.session.user_id = null;
     res.redirect(`/merchant/login`)
 })
-
-app.use((error, req, res, next) => {
-    res.send('something went wrong!!')
-})
 app.use((req, res) => {
     res.status(404).send('NOT FOUND!')
+})
+app.use((error, req, res, next) => {
+    const { message, status } = error;
+    res.status(status).send(message)
 })
 app.listen(3000, () => console.log('on port 3000'))
